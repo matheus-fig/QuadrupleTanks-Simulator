@@ -85,6 +85,8 @@ for k in range(n_steps):
     h4 = min(h4, h_max)
     h4 = max(h4, 0)
 
+    print(f"Passo {k}: u1={u1}, u2={u2}")
+
     states.append([h1, h2, h3, h4])
     errors.append([erro1, erro2])
 
