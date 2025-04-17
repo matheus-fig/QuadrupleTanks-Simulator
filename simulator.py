@@ -22,21 +22,26 @@ kp2 = 2.7
 ti1 = 30
 ti2 = 40
 
+controler_1 = np.array([[kp1],
+                        [ti1]])
+
 # ponto de operacao
 h1_0, h2_0, h3_0, h4_0 = 12.4, 12.7, 1.8, 1.4
 v1_0, v2_0 = 3, 3
 dt = 0.05     # passo de tempo
 n_steps = 7000     # passos de simulação
 
-# volts desejado
+# volts de referencia para alturas h1 e h2 == 4m
 r1 = -4.2
 r2 = -4.35
+
+r = np.array([[r1],
+              [r2]])
 
 # ====================================================================================================
 
 # cond iniciais
-u1 = 0
-u2 = 0
+u = np.zeros((2, 1)) # controlers u_k == [[u1], [u2]]
 h1, h2, h3, h4 = 10, 10, 1.8, 1.4
 
 # =====================================================================================================
@@ -44,9 +49,11 @@ h1, h2, h3, h4 = 10, 10, 1.8, 1.4
 states = [[h1, h2, h3, h4]] # armazenamento de estados
 errors = [[0, 0]] # armazenamento de erros
 
-# controladores
-controler_1 = ControladorPIDiscretoEuler(kp1, ti1, dt)
-controler_2 = ControladorPIDiscretoEuler(kp2, ti2, dt)
+# controladores no formato de lista
+controlers = [
+    ControladorPIDiscretoEuler(kp1, ti1, dt),
+    ControladorPIDiscretoEuler(kp2, ti2, dt)
+]
 
 # simulacao
 for k in range(n_steps):
@@ -55,16 +62,25 @@ for k in range(n_steps):
     y1 = kc * (h1 - h1_0)
     y2 = kc * (h2 - h2_0)
 
+    y_k = np.array([[y1],
+                    [y2]])
+
     # medicao dos erros
-    erro1 = r1 - y1
-    erro2 = r2 - y2
+    erro = r - y_k
 
     # controladores
-    u1 = controler_1.calcular_saida(erro1)
-    u2 = controler_2.calcular_saida(erro2)
+    for i in range(2):
+        u[i] = controlers[i].calcular_saida(erro[i])
+    
+    v0 = np.array([[v1_0],
+                   [v2_0]])
 
-    v1 = u1 + v1_0
-    v2 = u2 + v2_0
+    v = u + v0
+    # v1 = u1 + v1_0
+    # v2 = u2 + v2_0
+
+    v1 = v[0, 0]
+    v2 = v[1, 0]
 
     dh1_dt = -((a1 * np.sqrt(2 * g * h1)) / A1) + ((a3 * np.sqrt(2 * g * h3)) / A1) + ((gamma1 * k1 * v1) / A1)
     dh2_dt = -((a2 * np.sqrt(2 * g * h2)) / A2) + ((a4 * np.sqrt(2 * g * h4)) / A2) + ((gamma2 * k2 * v2) / A2)
@@ -85,10 +101,10 @@ for k in range(n_steps):
     h4 = min(h4, h_max)
     h4 = max(h4, 0)
 
-    print(f"Passo {k}: u1={u1}, u2={u2}")
+    print(f"Passo {k}: u1={u[0]}, u2={u[1]}")
 
     states.append([h1, h2, h3, h4])
-    errors.append([erro1, erro2])
+    errors.append([r])
 
 states = np.array(states)
 
