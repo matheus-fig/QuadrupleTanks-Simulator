@@ -100,9 +100,6 @@ for k in range(n_steps):
     h4 = min(h4, h_max)
     h4 = max(h4, 0)
 
-    print(f"{k}: u1={u[0,0]}, u2={u[1,0]}")
-    print(f"{k}: y1={y[0,0]}, y2={y[1,0]}")
-
     states_u.append([u[0,0], u[1,0]])
     states_y.append([y[0,0], y[1,0]])
     states_h.append([h1, h2, h3, h4])
