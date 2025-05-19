@@ -9,11 +9,6 @@ import matplotlib.pyplot as plt
 from controler_discrete import ControladorPIDiscretoEuler
 
 
-# p cada entrada, vai ter um vetor q indica o instante que houve um ataque ou não
-# criar um vetor com 7k
-# time to attack
-
-
 '''
 Definitions to implement DoS attack:
 
@@ -110,15 +105,59 @@ c2 = ControladorPIDiscretoEuler(kp2, ti2, dt)
 # variables to indicates the chanels that adversay can acess
 u1_set = True
 u2_set = True
-y1_set = True
-y2_set = True
+y1_set = False
+y2_set = False
 
 # time to attack
 time_attack = np.zeros(n_steps)
-time_attack[500:3000] = 1
+time_attack[0:50] = 1
+time_attack[100:150] = 1
+time_attack[300:400] = 1
+time_attack[500:750] = 1
+
+'''
+Definition of the matrices gamma for u and y
+'''
+
+# gamma u matrice configuration
+if u1_set and u2_set:
+    gamma_u = np.array([[1, 0],
+                        [0, 1]])
+elif u1_set:
+    gamma_u = np.array([[1],
+                        [0]])
+elif u2_set:
+    gamma_u = np.array([[0],
+                        [1]])
+else:
+    gamma_u = np.array([[0],
+                        [0]])  
+# transport matrice
+gamma_u_T = gamma_u.T
+
+# ====================================================
+
+# gamma y matrice configuration
+if y1_set and y2_set:
+    gamma_y = np.array([[1, 0],
+                        [0, 1]])
+elif y1_set:
+    gamma_y = np.array([[1],
+                        [0]])
+elif y2_set:
+    gamma_y = np.array([[0],
+                        [1]])
+else:
+    gamma_y = np.array([[0],
+                        [0]])
+# transport matrice
+gamma_y_T = gamma_y.T
 
 
-# simulation
+'''
+SIMULATION OF THE SYSTEM
+'''
+
 for k in range(n_steps):
 
     # copy last value of u when the time of attack not occur
@@ -126,52 +165,22 @@ for k in range(n_steps):
         u_t = u.copy()
         y_t = y.copy()
 
-    # gamma u matrice configuration
-    if u1_set and u2_set:
-        gamma_u = np.array([[1, 0],
-                        [0, 1]])
-    elif u1_set:
-        gamma_u = np.array([[1],
-                        [0]])
-    elif u2_set:
-        gamma_u = np.array([[0],
-                        [1]])
-    else:
-        gamma_u = np.array([[0],
-                        [0]])
-        
-    # transport matrice
-    gamma_u_T = gamma_u.T
-
 
     # S_u matrice configuration
     if u1_set and u2_set:
         S_u = np.array([[1, 0],
                         [0, 1]])
-    else:
+    elif u1_set or u2_set:
         S_u = np.array([[1]])
+    else:
+        S_u = np.array([[0]])
     
+
+
     # b_u definition
     b_u = -S_u @ gamma_u_T @ (u - u_t)
 
     # =====================================
-
-    # gamma y matrice configuration
-    if y1_set and y2_set:
-        gamma_y = np.array([[1, 0],
-                        [0, 1]])
-    elif y1_set:
-        gamma_y = np.array([[1],
-                        [0]])
-    elif y2_set:
-        gamma_y = np.array([[0],
-                        [1]])
-    else:
-        gamma_y = np.array([[0],
-                        [0]])
-        
-    # transport matrice
-    gamma_y_T = gamma_y.T
 
 
     # S_u matrice configuration

@@ -1,4 +1,4 @@
-# codigo do controlador
+# 
 
 class ControladorPIDiscretoEuler:
     def __init__(self, Kp, Ti, Ts):
@@ -43,9 +43,3 @@ Ti = 0.1  # Tempo integral
 Ts = 0.01 # Período de amostragem
 
 controlador = ControladorPIDiscretoEuler(Kp, Ti, Ts)
-
-# # Simulação (exemplo com erro constante)
-# erro = 1.0
-# for i in range(100):
-#     saida = controlador.calcular_saida(erro)
-#     print(f"Tempo: {i*Ts:.2f}, Saída: {saida:.2f}")
